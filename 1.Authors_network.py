@@ -6,20 +6,27 @@ Created on Fri Jun 29 16:33:07 2018
 """
 
 import os
-os.chdir(r'C:\Users\Yung\Desktop\netpharm comparison\author_network')
+os.chdir(r'C:\Users\yung\Desktop\NP methodology\author_network')
 
 import networkx as nx
 import pandas as pd
-import networkx as nx
 import itertools
 
-df = pd.read_excel('180629_netpharm_list(2017 update).xlsx', sheetname=0, index_col='약물')
-lists = df.T
+df = pd.read_excel('190127_netpharm_list(2017_affiliation).xlsx', sheetname=0, index_col='약물')
+df_T = df.T
+
+## Author network 구축
+
 
 G  = nx.Graph()
 
-for i in lists.Author:
-    auth = i.split(",")
+for i in range(len(df_T.index)):
+    
+    corr_author = df_T['Corr_author'].iloc[i].split(",")
+    auth = df_T['Author'].iloc[i].split(",")
+    
+    
+    
     for j in itertools.combinations(auth,2):
         G.add_edge(*j)
         
@@ -37,4 +44,12 @@ G_node.to_excel('author_list.xlsx')
 #G_dic_frame.to_excel('author_network.xlsx') 
 #    
     
+
+## Affliation network 구축
+
+G_aff = nx.Graph()
+
+
+
+
     
