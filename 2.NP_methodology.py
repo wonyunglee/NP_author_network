@@ -15,8 +15,154 @@ import itertools
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_excel('190127_netpharm_list(2017_affiliation).xlsx', sheetname=0, index_col='약물')
-df_T = df.T
+sns.set(style="white", context="talk")
+
+df = pd.read_excel('190127_netpharm_list(2017_affiliation).xlsx', sheet_name='drug_availavility,DTIs_methods', index_col='약물')
+
+## H-C, C-T, T-D database, method frequency
+# H-C
+
+HC_method = df['HC method']
+HC_method.dropna(axis=0, inplace=True)
+
+HC_fre = pd.DataFrame(columns=['HC_method','Frequency'])
+
+i=0
+
+for j in range (len(HC_method.index)):
+    
+    
+    HC = HC_method.iloc[j].split(", ")
+    
+    if type(HC) == str:
+        
+        HC_fre.iloc[i] = [[HC,1]]
+        i += 1
+    
+    else:
+        for p in range(len(HC)):
+               
+            HC_fre.loc[i] = [HC[p],1]
+            i += 1
+
+HC_pivot = HC_fre.pivot_table(index='HC_method',aggfunc='sum').sort_values(by = 'Frequency',ascending=False)
+        
+fig, ax = plt.subplots()
+fig.set_size_inches(12,10)
+
+g = sns.barplot(x=HC_pivot.index, y=HC_pivot['Frequency'])
+plt.setp(g.get_xticklabels(), rotation=90)
+
+
+# C-T 
+
+CT_method = df['CT method']
+CT_method.dropna(axis=0, inplace=True)
+
+CT_fre = pd.DataFrame(columns=['CT_method','Frequency'])
+
+i=0
+
+for j in range (len(CT_method.index)):
+    
+    
+    CT = CT_method.iloc[j].split(", ")
+    
+    if type(CT) == str:
+        
+        CT_fre.iloc[i] = [[CT,1]]
+        i += 1
+    
+    else:
+        for p in range(len(CT)):
+               
+            CT_fre.loc[i] = [CT[p],1]
+            i += 1
+
+CT_pivot = CT_fre.pivot_table(index='CT_method',aggfunc='sum').sort_values(by = 'Frequency',ascending=False)
+        
+fig, ax = plt.subplots()
+fig.set_size_inches(12,10)
+
+g = sns.barplot(x=CT_pivot.index, y=CT_pivot['Frequency'])
+plt.setp(g.get_xticklabels(), rotation=90)
+
+
+
+
+# T-D 
+
+TD_database = df['TD database']
+TD_database.dropna(axis=0, inplace=True)
+
+TD_fre = pd.DataFrame(columns=['TD_database','Frequency'])
+
+i=0
+
+for j in range (len(TD_database.index)):
+    
+    
+    TD = TD_database.iloc[j].split(", ")
+    
+    if type(TD) == str:
+        
+        TD_fre.iloc[i] = [[TD,1]]
+        i += 1
+    
+    else:
+        for p in range(len(TD)):
+               
+            TD_fre.loc[i] = [TD[p],1]
+            i += 1
+
+TD_pivot = TD_fre.pivot_table(index='TD_database',aggfunc='sum').sort_values(by = 'Frequency',ascending=False)
+        
+fig, ax = plt.subplots()
+fig.set_size_inches(12,10)
+
+g = sns.barplot(x=TD_pivot.index, y=TD_pivot['Frequency'])
+plt.setp(g.get_xticklabels(), rotation=90)
+
+
+# CT method by year
+
+CT_year = df[['year','Similarity approach','Structural approach','Experimental approach']]
+
+CT_year_pivot = CT_year.pivot_table(index='year')
+
+fig, ax = plt.subplots()
+fig.set_size_inches(12,10)
+ax.set_ylabel('Proportion')
+sns.lineplot(data=CT_year_pivot)
+
+# Drug availability assessment
+
+DA_year = df[['year','Drug availability','OB, DL']]
+
+DA_year_pivot = DA_year.pivot_table(index='year')
+
+
+fig, ax = plt.subplots()
+fig.set_size_inches(12,10)
+ax.set_ylabel('Proportion')
+sns.lineplot(data=DA_year_pivot)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Author network 구축
 
