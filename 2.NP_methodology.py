@@ -23,9 +23,10 @@ df = pd.read_excel('190127_netpharm_list(2017_affiliation).xlsx', sheet_name='dr
 # H-C
 
 HC_method = df['HC method']
+HC_year = df['year']
 HC_method.dropna(axis=0, inplace=True)
 
-HC_fre = pd.DataFrame(columns=['HC_method','Frequency'])
+HC_fre = pd.DataFrame(columns=['HC_method','Frequency','year'])
 
 i=0
 
@@ -33,33 +34,56 @@ for j in range (len(HC_method.index)):
     
     
     HC = HC_method.iloc[j].split(", ")
+    year = HC_year.iloc[j]
     
     if type(HC) == str:
         
-        HC_fre.iloc[i] = [[HC,1]]
+        HC_fre.loc[i] = [HC,1,year]
         i += 1
     
     else:
         for p in range(len(HC)):
                
-            HC_fre.loc[i] = [HC[p],1]
+            HC_fre.loc[i] = [HC[p],1,year]
             i += 1
 
-HC_pivot = HC_fre.pivot_table(index='HC_method',aggfunc='sum').sort_values(by = 'Frequency',ascending=False)
-        
+HC_pivot_fre = HC_fre.pivot_table(index='HC_method',aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency',ascending=False)
+HC_pivot_fre_year = HC_fre.pivot_table(index=['HC_method','year'],aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency',ascending=False)
+
+HC_pivot_fre_year = pd.DataFrame(HC_pivot_fre_year.to_records())
+
 fig, ax = plt.subplots()
 fig.set_size_inches(12,10)
 
-g = sns.barplot(x=HC_pivot.index, y=HC_pivot['Frequency'])
+
+g = sns.barplot(x=HC_pivot_fre.index, y=HC_pivot_fre['Frequency'])
 plt.setp(g.get_xticklabels(), rotation=90)
+plt.show()
+
+plt.close()
+
+
+fig, ax = plt.subplots()
+fig.set_size_inches(20,20)
+ax.legend(prop={'size':4})
+
+
+sns.lineplot(data=HC_pivot_fre_year, x='year', y='Frequency', hue='HC_method')
+plt.show()
+
+plt.close()
+
+
+
 
 
 # C-T 
 
 CT_method = df['CT method']
+CT_year = df['year']
 CT_method.dropna(axis=0, inplace=True)
 
-CT_fre = pd.DataFrame(columns=['CT_method','Frequency'])
+CT_fre = pd.DataFrame(columns=['CT_method','Frequency','year'])
 
 i=0
 
@@ -67,25 +91,48 @@ for j in range (len(CT_method.index)):
     
     
     CT = CT_method.iloc[j].split(", ")
+    year = CT_year.iloc[j]
     
     if type(CT) == str:
         
-        CT_fre.iloc[i] = [[CT,1]]
+        CT_fre.loc[i] = [CT,1,year]
         i += 1
     
     else:
         for p in range(len(CT)):
                
-            CT_fre.loc[i] = [CT[p],1]
+            CT_fre.loc[i] = [CT[p],1,year]
             i += 1
 
-CT_pivot = CT_fre.pivot_table(index='CT_method',aggfunc='sum').sort_values(by = 'Frequency',ascending=False)
-        
+CT_pivot_fre = CT_fre.pivot_table(index='CT_method',aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency',ascending=False)
+CT_pivot_fre_year = CT_fre.pivot_table(index=['CT_method','year'],aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency',ascending=False)
+
+CT_pivot_fre_year = pd.DataFrame(CT_pivot_fre_year.to_records())
+
 fig, ax = plt.subplots()
 fig.set_size_inches(12,10)
 
-g = sns.barplot(x=CT_pivot.index, y=CT_pivot['Frequency'])
+
+
+g = sns.barplot(x=CT_pivot_fre.index, y=CT_pivot_fre['Frequency'])
 plt.setp(g.get_xticklabels(), rotation=90)
+
+plt.show()
+plt.close()
+
+
+fig, ax = plt.subplots()
+fig.set_size_inches(20,20)
+ax.legend(prop={'size':4})
+
+
+
+
+sns.lineplot(data=CT_pivot_fre_year, x='year', y='Frequency', hue='CT_method')
+plt.show()
+
+plt.close()
+
 
 
 
@@ -93,9 +140,10 @@ plt.setp(g.get_xticklabels(), rotation=90)
 # T-D 
 
 TD_database = df['TD database']
+TD_year = df['year']
 TD_database.dropna(axis=0, inplace=True)
 
-TD_fre = pd.DataFrame(columns=['TD_database','Frequency'])
+TD_fre = pd.DataFrame(columns=['TD_database','Frequency','year'])
 
 i=0
 
@@ -103,25 +151,51 @@ for j in range (len(TD_database.index)):
     
     
     TD = TD_database.iloc[j].split(", ")
+    year = TD_year.iloc[j]
     
     if type(TD) == str:
         
-        TD_fre.iloc[i] = [[TD,1]]
+        TD_fre.loc[i] = [TD,1,year]
         i += 1
     
     else:
         for p in range(len(TD)):
                
-            TD_fre.loc[i] = [TD[p],1]
+            TD_fre.loc[i] = [TD[p],1,year]
             i += 1
 
-TD_pivot = TD_fre.pivot_table(index='TD_database',aggfunc='sum').sort_values(by = 'Frequency',ascending=False)
-        
+TD_pivot_fre = TD_fre.pivot_table(index='TD_database',aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency',ascending=False)
+TD_pivot_fre_year = TD_fre.pivot_table(index=['TD_database','year'],aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency',ascending=False)
+
+TD_pivot_fre_year = pd.DataFrame(TD_pivot_fre_year.to_records())
+
 fig, ax = plt.subplots()
 fig.set_size_inches(12,10)
 
-g = sns.barplot(x=TD_pivot.index, y=TD_pivot['Frequency'])
+
+
+g = sns.barplot(x=TD_pivot_fre.index, y=TD_pivot_fre['Frequency'])
+
+
 plt.setp(g.get_xticklabels(), rotation=90)
+
+plt.show()
+plt.close()
+
+
+fig, ax = plt.subplots()
+fig.set_size_inches(20,20)
+
+
+ax.legend(prop={'size':4})
+sns.lineplot(data=TD_pivot_fre_year, x='year', y='Frequency', hue='TD_database')
+plt.show()
+
+plt.close()
+
+
+
+
 
 
 # CT method by year
@@ -148,190 +222,66 @@ ax.set_ylabel('Proportion')
 sns.lineplot(data=DA_year_pivot)
 
 
+### C-T-D network construction
+
+graph = nx.Graph()
+
+# CT_pair
+
+HCT_method = df[['HC method','CT method']]
+HCT_method.dropna(axis=0, inplace=True)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Author network 구축
-
-
-G  = nx.Graph()
-
-# co-authorship network construction 
-
-for i in range(len(df_T.index)):
+for i in range(len(HCT_method.index)):
+    HC = HCT_method.iloc[i]['HC method']
+    CT = HCT_method.iloc[i]['CT method']
     
-#    corr_author = df_T['Corr_author'].iloc[i].split(",")
-    auth = df_T['Author'].iloc[i].split(",")
-    year = df_T['Year'].iloc[i]
-    
-    for j in itertools.combinations(auth,2):
-        G.add_edge(*j, year=year)
+    if graph.has_edge(HC, CT):
+        graph[HC][CT]['weight'] += 1
         
-G_edge = nx.to_pandas_edgelist(G)
-G_edge.to_excel('author_edge_list.xlsx')
+    else:
+        graph.add_edge(HC,CT, weight=1)
+    
+CTD_method = df[['CT method','TD database']]
+CTD_method.dropna(axis=0, inplace=True)
 
-G_node = pd.DataFrame(list(G.nodes()))
-#G_node.to_excel('author_node_list.xlsx')
-
-degree_auth = pd.DataFrame(list(nx.degree(G)), columns=['index','degree'])
-degree_auth.to_excel('author_degree.xlsx')
+for j in range(len(CTD_method.index)):
+    CT = CTD_method.iloc[j]['CT method']
+    TD = CTD_method.iloc[j]['TD database']
+    
+    if graph.has_edge(CT, TD):
+        graph[CT][TD]['weight'] += 1
+    
+    else:
+        graph.add_edge(CT,TD,weight =1)
         
-#G_nodes_frame = pd.DataFrame(G.nodes())
-#G_nodes_frame.to_excel('authors_list.xlsx') 
-#   
-#G_dic_frame = pd.DataFrame(G.edges())
-#G_dic_frame.to_excel('author_network.xlsx') 
-#    
-    
+HCTD_network = nx.to_pandas_edgelist(graph)
+
+HCTD_network.to_excel('HCTD network edgelist.xlsx')
+
+# node attribute
+
+HC = pd.DataFrame(np.array(df['HC method']), columns = ['Method']).dropna(axis=0)
+HC['Frequency'] = 1
+HC_pivot = HC.pivot_table(index = 'Method', values='Frequency', aggfunc='sum')
+HC_pivot= HC_pivot.sort_values('Frequency', ascending=False)
+HC_pivot['type'] = 'HC'
+
+CT = pd.DataFrame(np.array(df['CT method']), columns = ['Method']).dropna(axis=0)
+CT['Frequency'] = 1
+CT_pivot = CT.pivot_table(index = 'Method', values='Frequency', aggfunc='sum')
+CT_pivot= CT_pivot.sort_values('Frequency', ascending=False)
+CT_pivot['type'] = 'CT'
+
+TD = pd.DataFrame(list(df['TD database']), columns = ['Method']).dropna(axis=0)
+TD['Frequency'] = 1
+TD_pivot = TD.pivot_table(index = 'Method', values='Frequency', aggfunc='sum')
+TD_pivot= TD_pivot.sort_values('Frequency', ascending=False)
+TD_pivot['type'] = 'TD'
+
+HCTD_att = pd.concat([HC_pivot, CT_pivot, TD_pivot])
+
+HCTD_att.to_excel('HCTD network attr.xlsx')
 
 
-## Affliation network construction
-
-G_aff = nx.Graph()
-
-# co-authorship network construction 
-
-for i in range(len(df_T.index)):
-    
-#    corr_author = df_T['Corr_author'].iloc[i].split(",")
-    auth_aff = df_T['affiliation'].iloc[i].split(",")
-    year = df_T['Year'].iloc[i]
-    
-    for j in itertools.combinations(auth_aff,2):
-        G_aff.add_edge(*j, year=year)
-        
-G_edge_aff = nx.to_pandas_edgelist(G_aff)
-
-G_edge_aff.to_excel('affliation_edge_list.xlsx')
-
-G_node_aff = pd.DataFrame(list(G_aff.nodes()))
-#G_node_aff.to_excel('affliation_node_list.xlsx')
-
-degree_aff = pd.DataFrame(list(nx.degree(G_aff)), columns=['index','degree'])
-degree_aff.to_excel('affliation_degree.xlsx')
-
-
-## affiliation, paper by year
-
-aff_paper_year = pd.DataFrame(np.array(np.zeros((8,2))),columns = (['year','affiliation']), 
-                              index = ([i for i in range(2011,2019)]))
-
-aff = pd.DataFrame(df_T[['affiliation','Year']])
-
-for i in range(2011,2019):
-    
-    author_group = (aff['Year'] == i)
-    author_group = aff[author_group]
-    
-    author_list = []
-    
-    for j in range(len(author_group.index)):        
-        author_list.extend(author_group.iloc[j])
-        
-    author_list = list(set(author_list))        
-    aff_paper_year['affiliation'].loc[i] = len(author_list)    
-#        
-#aff_1 = pd.DataFrame(G_edge_aff[['source', 'year']])
-#aff_1['1'] = np.array(np.ones((len(aff_1.index))))
-#pivot_1 = aff_1.pivot_table(index='year', values='1', aggfunc='sum' )
-#
-#aff_2 = pd.DataFrame(G_edge_aff[['target', 'year']])
-#aff_2['1'] = np.array(np.ones((len(aff_1.index))))
-#pivot_2 = aff_2.pivot_table(index='year', values='1', aggfunc='sum')
-#
-#aff_pivot = pivot_1 + pivot_2
-#
-#aff_paper_year['affiliation'] = aff_pivot['1']
-
-
-paper =  pd.DataFrame(df_T['Year'])
-paper['1'] = np.array(np.ones((len(paper.index))))
-pivot_3 = paper.pivot_table(index='Year',values='1', aggfunc='sum')
-
-aff_paper_year['year'] = pivot_3['1']
-
-# visualization
-
-plt.plot(aff_paper_year['year'], 'r')
-plt.plot(aff_paper_year['affiliation'], 'b')
-plt.legend(['Affiliation', 'paper'])
-plt.show()
-
-
-
-
-### drug-availability(DA) and drug-target interaction (DTI) ratio visualization
-
-df_method = pd.read_excel('190127_netpharm_list(2017_affiliation).xlsx', sheetname='drug_availavility,DTIs_methods')
-
-# DA visualization
-
-df_DA = df_method[['year','DTIs construction','Drug availability','OBDL']]
-df_DA_ratio = pd.DataFrame(np.array(np.zeros((8,2))),columns = (['DA','OB_DL']), 
-                              index = ([i for i in range(2011,2019)]))
-for i in range(2011,2019):
-    
-    DA_method = (df_DA['year'] == i)
-    DA_method = df_DA[DA_method]
-    
-    ratio_DA = DA_method['Drug availability'].sum() / DA_method['DTIs construction'].sum()
-    ratio_OBDL = DA_method['OBDL'].sum() / DA_method['DTIs construction'].sum()
-    
-    df_DA_ratio.loc[i] = np.array([[ratio_DA,ratio_OBDL]])
-    
-plt.plot(df_DA_ratio['DA'], 'coral')
-plt.plot(df_DA_ratio['OB_DL'], 'r')
-plt.legend(['Drug availability', 'OB & DL'])
-plt.show()
-
-df_DA_ratio.to_excel('DA_ratio.xlsx')
-
-
-# DTI visualization
-
-df_DTI = df_method[['year','Similarity-based approach','Structure-based approach','Experiment-based approach']]
-df_DTI_ratio = pd.DataFrame(np.array(np.zeros((8,3))),columns = (['Similarity-based approach','Structure-based approach','Experiment-based approach']), 
-                              index = ([i for i in range(2011,2019)]))
-
-for j in range(2011,2019):
-    
-    DTI_method = (df_DTI['year'] == j)
-    DTI_method = df_DTI[DTI_method]
-    
-    DTI_sum = DTI_method[['Similarity-based approach','Structure-based approach','Experiment-based approach']]
-    DTI_sum = DTI_sum.sum().sum()
-    
-    ratio_similrity = DTI_method['Similarity-based approach'].sum() / DTI_sum
-    ratio_structure = DTI_method['Structure-based approach'].sum() / DTI_sum
-    ratio_experiment = DTI_method['Experiment-based approach'].sum() / DTI_sum
-
-    df_DTI_ratio.loc[j] = np.array([[ratio_similrity,ratio_structure,ratio_experiment]])
-
-
-red = np.array([229,36,38]) / 256
-green = np.array([243,232,0])/256
-blue = np.array([32,114,178])/256
-
-plt.plot(df_DTI_ratio['Similarity-based approach'], color= red)
-plt.plot(df_DTI_ratio['Structure-based approach'], color= green)
-plt.plot(df_DTI_ratio['Experiment-based approach'], color= blue)
-plt.legend(['Similarity-based approach','Structure-based approach','Experiment-based approach'])
-plt.show()
-
-    
-df_DTI_ratio.to_excel('DTI_ratio.xlsx')
- 
     

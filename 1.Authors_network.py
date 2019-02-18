@@ -15,27 +15,79 @@ import itertools
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_excel('190127_netpharm_list(2017_affiliation).xlsx', sheetname=0, index_col='약물')
-df_T = df.T
+df = pd.read_excel('190228_netpharm_list (2018).xlsx', sheet_name='drug_availavility,DTIs_methods', index_col='약물')
 
-## Author network 구축
-
-
-G  = nx.Graph()
 
 # co-authorship network construction 
 
-for i in range(len(df_T.index)):
+G  = nx.Graph()
+
+for i in range(len(df.index)):
+
+    auth = df['author'].iloc[i].split(",")
+    for j in itertools.combinations(auth,2):
+        G.add_edge(*j)
+
+        
+author_net = nx.to_pandas_edgelist(G)
+author_net['early'] = 0
+author_net['late'] = 0
+G = nx.from_pandas_edgelist(author_net, edge_attr=['early','late'])    
+
+# author network time attr
+
+early = (df['year']<=2014)
+late = (df['year']>2014)
+
+period = {0:early, 1:late}
+
+for q in range(len(period)):
+    
+    df_period = df.loc[period[q]]
+    
+    if q == 0:
+        time = 'early'
+    else:
+        time = 'late'
+    
+    for i in range(len(df_period.index)):
+        
+        auth = df_period['author'].iloc[i].split(",")
+    
+        for j in itertools.combinations(auth,2):
+            
+            G[j[0]][j[1]][time] = 1
+
+author_net = nx.to_pandas_edgelist(G)
+author_net.to_excel('author_network.xlsx')
+
+# corresponding author frequency
+
+
+
+
+
+
+
+
+    
+for i in range(len(df.index)):
     
 #    corr_author = df_T['Corr_author'].iloc[i].split(",")
-    auth = df_T['Author'].iloc[i].split(",")
-    year = df_T['Year'].iloc[i]
+    auth = df['author'].iloc[i].split(",")
+    year = df['year'].iloc[i]
     
     for j in itertools.combinations(auth,2):
         G.add_edge(*j, year=year)
         
 G_edge = nx.to_pandas_edgelist(G)
 G_edge.to_excel('author_edge_list.xlsx')
+
+
+
+
+
+
 
 G_node = pd.DataFrame(list(G.nodes()))
 #G_node.to_excel('author_node_list.xlsx')
@@ -76,6 +128,8 @@ G_node_aff = pd.DataFrame(list(G_aff.nodes()))
 
 degree_aff = pd.DataFrame(list(nx.degree(G_aff)), columns=['index','degree'])
 degree_aff.to_excel('affliation_degree.xlsx')
+
+
 
 
 ## affiliation, paper by year
