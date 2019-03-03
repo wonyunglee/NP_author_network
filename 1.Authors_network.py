@@ -17,86 +17,10 @@ import matplotlib.pyplot as plt
 
 df = pd.read_excel('190228_netpharm_list (2018).xlsx', sheet_name='drug_availavility,DTIs_methods', index_col='약물')
 
-def Frequency(df_name, column_name, split_by):
-    list_name = []
-    
-    for i in range(len(df_name.index)):
-        
-        name = df_name[column_name].iloc[i].split(split_by)
-        
-        if type(name) == str:
-            name = [name]
-        
-        list_name.extend(name)
-            
-    list_name = list(set(list_name))    
-    
-    df_year_fre = pd.DataFrame(np.zeros((len(list_name),3)), columns=[column_name,'year','Frequency'])
-    
-    k=0
-    
-    for j in range(len(df_name.index)):
-        
-        element = df_name[column_name].iloc[j].split(split_by)
-        year = df_name['year'].iloc[j]
-        
-        if type(name) == str:
-            element = [element]
-        
-        for p in range(len(element)):
-         
-            df_year_fre.loc[k] = [element[p],year,1]
-            k+=1
-            
-    pivot_fre_year = df_year_fre.pivot_table(index = [column_name,'year'], aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency',ascending=False)
-    pivot_fre_year = pd.DataFrame(pivot_fre_year.to_records())
-        
-    return pivot_fre_year
 
-def frequency_over_threshold(pivot_table, column, threshold):
-        
-    pivot = pivot_table.pivot_table(index='affiliation',aggfunc='sum', values = 'Frequency').sort_values(by = 'Frequency', ascending = False)
-    over_threshold = pivot.index[(pivot['Frequency'] >= threshold)]
-    over_threshold_row = pivot.index.isin(list(over_threshold))
-    pivot = pivot_table.loc[over_threshold_row]
-    pivot = pivot.reset_index(drop=True)
-    
-    return pivot
 
-def stacked_barplot_visual(pivot_table, column, threshold, y_ticks, save_fig_name):
-    
-    fre_year = pivot_table.pivot_table(index=[str(column)],columns=['year'], aggfunc=np.sum, fill_value=0)
-    
-    years = [i for i in range (int(fre_year.columns[0][1]),int(fre_year.columns[-1][1]+1))]
-    fre_year.columns = years
-    fre_year['sum'] = fre_year.sum(axis=1)
 
-    over_threshold = (fre_year['sum'] >= threshold)
-    fre_year = fre_year.loc[over_threshold]
-    fre_year = fre_year.sort_values(by='sum', ascending = True)
-    
-    max_value = fre_year['sum'].iloc[-1]
-    
-    del fre_year['sum']
-    
-    ax = fre_year.plot(kind='bar', stacked=True, figsize= (12,10), fontsize = 20, legend= 'reverse', width=0.8)
 
-    handles, labels = ax.get_legend_handles_labels()
-    ax.legend(reversed(handles), reversed(labels), prop={'size':20}) 
-    ax.set_yticks([i*y_ticks for i in range(max_value//y_ticks +2)])
-    
-    plt.xlabel('')
-    plt.ylim(0,((max_value//10)*10 +11))
-        
-    plt.savefig(str(save_fig_name))
-    plt.show()
-    plt.close()
-    
-    return ax
-
-aff = Frequency(df, 'affiliation', ",")
-
-aff_bar = stacked_barplot_visual(aff,'affiliation',5,5,'0.affiliation fre.png' )
 
 
 ### co-authorship network construction 
@@ -466,24 +390,83 @@ df_author_DA = pd.DataFrame(columns = ['corresponding au','total','Drug availabi
 
 
 
-        
-
-co_author_list = list_generation(df, 'corresponding au', ",")
 
 
 
 
+###### DA, DTIs ratio by index
 
-
-
-
-
-
-
-df = pd.read_excel('190228_netpharm_list (2018).xlsx', sheetname='drug_availavility,DTIs_methods')
-
-df_author_aff = df[['author','affiliation','year','Drug availability','OB & DL', 'Chemogenomic approach', 'Docking simulation approach','Ligand-based approach','Others']]
-
-
-
+def DA_DTI_ratio(df, index_column, year_from, year_to):
+    # DA (OB, DL)은 사용 여부 / DTIs type은 빈도를 보내줌 
     
+    df = df.reset_index(drop=True)
+    year_range =  df['year'].isin(i for i in range( year_from, year_to+1))
+    df = df.loc[year_range]
+    
+    index_list = []
+    
+    for i in range(len(df.index)):
+        
+        index = df[index_column].iloc[i].split(",")
+        
+        if type(index) == str:
+            index = [index]
+            
+        for j in range(len(index)):
+            
+            index_list.extend(index)
+            
+    index_list = list(set(index_list))
+    
+    DA_method = pd.DataFrame(np.zeros((len(index_list),6)), index = index_list, columns = ['Drug availability','OB & DL','Chemogenomic approach','Docking simulation approach','Ligand-based approach','Others'])
+    
+    for p in range(len(df.index)):
+        
+        index = df[index_column].iloc[p].split(",")
+        
+        method = df[list(DA_method.columns)].iloc[p]
+        
+        if type(index) == str:
+            index = [index]
+        
+        for q in range(len(index)):
+            
+            DA_method.loc[index[q]] += method
+    
+    
+    DA_array = np.array(DA_method[['Drug availability','OB & DL']])
+    over_one = DA_array >= 1
+ 
+    DA_array[over_one] = 1
+    DA_type = DA_array.sum(axis=1)
+    
+    DA_method[['Drug availability','OB & DL']] = DA_array
+    DA_method['DA type'] =DA_type
+    
+    return DA_method
+    
+# DA, DTI ratio of co-author
+
+co_early = DA_DTI_ratio(df, 'corresponding au', 2011,2014)
+co_early.to_excel('0. DA,DTI_co_au_early.xlsx')
+
+co_late = DA_DTI_ratio(df, 'corresponding au', 2015,2018)
+co_late.to_excel('0. DA,DTI_co_au_late.xlsx')
+
+co_total = DA_DTI_ratio(df, 'corresponding au', 2011,2018)
+co_total.to_excel('0. DA,DTI_co_au_total.xlsx')
+
+aff_early = DA_DTI_ratio(df, 'affiliation', 2011,2014)
+aff_early.to_excel('0. DA,DTI_aff_early.xlsx')
+
+aff_late= DA_DTI_ratio(df, 'affiliation', 2015,2018)
+aff_late.to_excel('0. DA,DTI_aff_late.xlsx')
+
+aff_total = DA_DTI_ratio(df, 'affiliation', 2011,2018)
+aff_total.to_excel('0. DA,DTI_aff_total.xlsx')
+
+
+
+
+
+

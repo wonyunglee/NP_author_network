@@ -120,6 +120,18 @@ CT_bar = stacked_barplot_visual(CT, 'CT method', 5, 10,'2. CT fre.png')
 TD = Frequency(df, 'TD database', ', ')
 TD_bar = stacked_barplot_visual(TD, 'TD database', 5, 10,'3. TD fre.png')
 
+
+
+
+
+
+
+
+
+
+
+
+
 # H-C
 
 HC_method = df['HC method']
