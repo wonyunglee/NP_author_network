@@ -15,6 +15,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import holoviews as hv
 from holoviews import opts, dim
+import matplotlib as mpl
 
 sns.set(style="white", context="talk")
 
@@ -37,7 +38,8 @@ def Frequency(df_name, column_name, split_by):
             name = [name]
         
         list_name.extend(name)
-            
+    
+        
     list_name = list(set(list_name))    
     
     df_year_fre = pd.DataFrame(np.zeros((len(list_name),3)), columns=[column_name,'year','Frequency'])
@@ -88,10 +90,10 @@ def stacked_barplot_visual(pivot_table, column, threshold, y_ticks, save_fig_nam
     
     del fre_year['sum']
     
-    ax = fre_year.plot(kind='bar', stacked=True, figsize= (12,10), fontsize = 20, legend= 'reverse', width=0.8)
+    ax = fre_year.plot(kind='bar', stacked=True, figsize= (8,6), fontsize = 15, legend= 'reverse', width=0.8)
 
     handles, labels = ax.get_legend_handles_labels()
-    ax.legend(reversed(handles), reversed(labels), prop={'size':20}) 
+    ax.legend(reversed(handles), reversed(labels), prop={'size':15}) 
     ax.set_yticks([i*y_ticks for i in range(max_value//y_ticks +2)])
     
     plt.xlabel('')
@@ -385,7 +387,7 @@ subgroup_names = []
 subgroup_size = []
 subgroup_color = []
 
-method_threshold = 3   # 2 이상인 method만 보이게 / 1은 합쳐서 others 처
+method_threshold = 3   # threshold 이상인 method만 보이게 / 1은 합쳐서 others 처
 
 for i in range(len(CT_type_names)):
 
@@ -411,18 +413,19 @@ for i in range(len(CT_type_names)):
 # First ring
 
 fig, ax = plt.subplots() 
-fig.set_size_inches(12,10)
+fig.set_size_inches(8,8)
 
 ax.axis('equal') 
-mypie, _ = ax.pie(CT_type_size, radius=1.3-0.3, labels=['','','',''], colors=[a(0.7), b(0.7), c(0.7),d(0.7)], startangle = -275) 
-plt.setp( mypie, width=0.3, edgecolor='white') 
+mypie, _ = ax.pie(CT_type_size, radius=1.3, labels=['','','',''], colors=[a(0.7), b(0.7), c(0.7),d(0.7)], startangle = -280) 
+# mypie, _ = ax.pie(CT_type_size, radius=1.3-0.3, labels=['','','',''], colors=[a(0.7), b(0.7), c(0.7),d(0.7)], startangle = -275) 
 
+plt.setp( mypie, width=1.3, edgecolor='white') 
 
 # Second ring
 
-mypie2, texts = ax.pie(subgroup_size, radius=1.3, labels=subgroup_names, labeldistance=1.05, colors =subgroup_color, startangle = -275) 
+mypie2, texts = ax.pie(subgroup_size, radius=1.3, labels=subgroup_names, labeldistance=1.05, colors =subgroup_color, startangle = -280) 
 
-plt.setp( mypie2, width=0.4, edgecolor='white') 
+plt.setp( mypie2, width=0.3, edgecolor='white') 
 plt.margins(0,0) 
 
 plt.show()
@@ -497,7 +500,7 @@ for i in range (len(CT_method.index)):
 
 CT_co_occu = nx.to_pandas_edgelist(G_CT)                
 
-#CT_co_occu.to_excel('4. CT co_occurrence.xlsx')    
+CT_co_occu.to_excel('4. CT co_occurrence.xlsx')    
 
 
 
@@ -599,10 +602,10 @@ subgroup_names = []
 subgroup_size = []
 subgroup_color = []
 
-method_threshold = 3   # 2 이상인 method만 보이게 / 1은 합쳐서 others 처
+method_threshold = 3   # 2 이상인 method만 보이게 / 1은 합쳐서 others 
 
 for i in range(len(TD_type_names)):
-
+ram
     type_is = (TD_pivot_fre['type'] == TD_type_names[i])
     df_subgroup_raw = TD_pivot_fre.loc[type_is]
     
@@ -615,7 +618,7 @@ for i in range(len(TD_type_names)):
     for j in range(len(df_subgroup.index)):
         subgroup_color.append(color_list[i](0.7-0.1*j))
     
-    if len(df_over_threshold) != df_over_threshold.sum():  # if isin false in dataframe
+    if len(df_over_threshold) != df_over_threshold.sum():  # if isin false in datafe
         subgroup_names.append('Others')
         subgroup_size.append(df_subgroup_raw['Frequency'].loc[~df_over_threshold].sum())
         subgroup_color.append(color_list[i](0))
@@ -623,24 +626,29 @@ for i in range(len(TD_type_names)):
 # First ring
 
 fig, ax = plt.subplots() 
-fig.set_size_inches(12,10)
+fig.set_size_inches(8,8)
 
 ax.axis('equal') 
-mypie, _ = ax.pie(TD_type_size, radius=1.3-0.3, labels=['','',''], colors=[a(0.7), b(0.7), c(0.7)], startangle = 0) 
-plt.setp( mypie, width=0.3, edgecolor='white') 
+mypie, _ = ax.pie(TD_type_size, radius=1.3, labels=['','',''], colors=[a(0.7), b(0.7), c(0.7)], startangle = 0) 
+plt.setp( mypie, width=1.3, edgecolor='white') 
+
+#mypie, _ = ax.pie(TD_type_size, radius=1.3-0.3, labels=['','',''], colors=[a(0.7), b(0.7), c(0.7)], startangle = 0) 
+#plt.setp( mypie, width=0.3, edgecolor='white') 
 
 
 # Second ring
 
 mypie2, texts = ax.pie(subgroup_size, radius=1.3, labels=subgroup_names, labeldistance=1.1, colors =subgroup_color, startangle = 0) 
 
-plt.setp( mypie2, width=0.4, edgecolor='white') 
+plt.setp( mypie2, width=0.3, edgecolor='white')  # second ring width 조
 plt.margins(0,0) 
 
 plt.show()
 
 #plt.savefig('3. TD fre by type.png')
 plt.close()
+
+
 
 
 

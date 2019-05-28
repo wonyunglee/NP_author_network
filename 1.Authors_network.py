@@ -67,7 +67,7 @@ for q in range(len(period)):
 
 author_net = nx.to_pandas_edgelist(G)
 author_net['total'] = author_net['early'] + author_net['late']
-author_net.to_excel('1. author_network.xlsx')
+#author_net.to_excel('1. author_network.xlsx')
 
 # author frequency
 
@@ -139,7 +139,7 @@ for q in range(len(period)):
 author_list['fre'] = author_list['early'] + author_list['late']
 
 
-author_list.to_excel('1. corr_frequency.xlsx')
+#author_list.to_excel('1. corr_frequency.xlsx')
  
 
 ### Affliation network construction
@@ -191,7 +191,7 @@ for q in range(len(period)):
 
 aff_net = nx.to_pandas_edgelist(G_aff)
 aff_net['total'] = aff_net['early'] + aff_net['late']
-aff_net.to_excel('2. aff_network.xlsx')
+#aff_net.to_excel('2. aff_network.xlsx')
 
 # affiliation frequency
 
@@ -236,7 +236,7 @@ for q in range(len(period)):
             aff_list[time].loc[aff[j]] += 1            
                 
 aff_list['total'] = aff_list['early'] + aff_list['late']
-aff_list.to_excel('2. aff_frequency.xlsx')
+#aff_list.to_excel('2. aff_frequency.xlsx')
 
 
 
@@ -278,15 +278,21 @@ aff_paper_year['year'] = pivot_3['1']
 
 # visualization
 
-
 red = tuple(np.array([229,36,38]) / 256)
 blue = tuple(np.array([32,114,178])/256)
 
-plt.plot(aff_paper_year['year'], color =blue )
-plt.plot(aff_paper_year['affiliation'], color=red)
-plt.legend(['Affiliation', 'Paper'])
-plt.show()
+fig, ax = plt.subplots()
+fig.set_size_inches(8,6)
 
+ax = plt.plot(aff_paper_year['affiliation'], color=red,  marker='s')
+ax = plt.plot(aff_paper_year['year'], color =blue, marker='s')
+
+plt.legend(['Affiliation', 'Paper'])
+
+plt.show()
+plt.close()
+
+   
 
 ### drug-availability(DA) and drug-target interaction (DTI) ratio visualization
 
@@ -310,30 +316,34 @@ for i in range(2012,2019):
     
 
 fig, ax = plt.subplots()
-fig.set_size_inches(12,10)
+fig.set_size_inches(8,6)
 
-plt.plot(df_DA_ratio['Drug availability'], 'coral')
-plt.plot(df_DA_ratio['OB & DL'], 'r')
+plt.plot(df_DA_ratio['Drug availability'], 'purple', marker='s')
+plt.plot(df_DA_ratio['OB & DL'], 'lime', marker='s')
 
-plt.setp(ax.get_xticklabels(), fontsize='20')
-plt.setp(ax.get_yticklabels(), fontsize='20')
+plt.setp(ax.get_xticklabels(), fontsize='15')
+plt.setp(ax.get_yticklabels(), fontsize='15')
+plt.legend(['Drug availability', 'OB & DL'], prop={'size':15})
 
-plt.legend(['Drug availability', 'OB & DL'])
-plt.savefig('4. DA_ratio.png')
+plt.ylim(0,1)
+
+#plt.savefig('1. DA_ratio.png')
 plt.show()
 plt.close()
 
-df_DA_ratio.to_excel('4. DA_ratio.xlsx')
+#df_DA_ratio.to_excel('1. DA_ratio.xlsx')
+
+
 
 
 # DTI visualization
 
-df_DTI_ratio = pd.DataFrame(np.array(np.zeros((7,4))),columns = (['Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Experimental approach']), 
+df_DTI_ratio = pd.DataFrame(np.array(np.zeros((7,4))),columns = (['Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Others']), 
                               index = ([i for i in range(2012,2019)]))
 
 df_DTI = pd.read_excel('190228_netpharm_list (2018).xlsx', sheetname='drug_availavility,DTIs_methods')
 
-df_DTI = df_DTI[['year','Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Experimental approach']]
+df_DTI = df_DTI[['year','Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Others']]
 
 
 for j in range(2012,2019):
@@ -341,13 +351,13 @@ for j in range(2012,2019):
     DTI_method = (df_DTI['year'] == j)
     DTI_method = df_DTI[DTI_method]
     
-    DTI_sum = DTI_method[['Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Experimental approach']]
+    DTI_sum = DTI_method[['Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Others']]
     DTI_sum = DTI_sum.sum().sum()
     
     ratio_chemogenomic = DTI_method['Chemogenomic approach'].sum() / DTI_sum
     ratio_docking = DTI_method['Docking simulation approach'].sum() / DTI_sum
     ratio_ligand = DTI_method['Ligand-based approach'].sum() / DTI_sum
-    ratio_experiment = DTI_method['Experimental approach'].sum() / DTI_sum
+    ratio_experiment = DTI_method['Others'].sum() / DTI_sum
 
 
     df_DTI_ratio.loc[j] = np.array([[ratio_chemogenomic,ratio_docking,ratio_ligand, ratio_experiment]])
@@ -361,17 +371,19 @@ yellow = np.array([218,124,48])/256
 fig, ax = plt.subplots()
 fig.set_size_inches(12,10)
 
-plt.plot(df_DTI_ratio['Chemogenomic approach'], color= red)
-plt.plot(df_DTI_ratio['Docking simulation approach'], color= green)
-plt.plot(df_DTI_ratio['Ligand-based approach'], color= blue)
-plt.plot(df_DTI_ratio['Experimental approach'], color= yellow)
+plt.plot(df_DTI_ratio['Chemogenomic approach'], color= blue, linewidth=3, marker='s')
+plt.plot(df_DTI_ratio['Docking simulation approach'], color= red, linewidth=3, marker='s')
+plt.plot(df_DTI_ratio['Ligand-based approach'], color= green, linewidth=3, marker='s')
+plt.plot(df_DTI_ratio['Others'], color= yellow, linewidth=3, marker='s')
 
+plt.legend(prop={'size':15})
+plt.ylim(0,0.51)
 
 plt.setp(ax.get_xticklabels(), fontsize='20')
 plt.setp(ax.get_yticklabels(), fontsize='20')
 
-plt.legend(['Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Experimental approach'])
-plt.show('4. DTI_ratio.png')
+plt.legend(['Chemogenomic approach','Docking simulation approach','Ligand-based approach', 'Others'])
+plt.show()
     
 df_DTI_ratio.to_excel('4. DTI_ratio.xlsx')
  
